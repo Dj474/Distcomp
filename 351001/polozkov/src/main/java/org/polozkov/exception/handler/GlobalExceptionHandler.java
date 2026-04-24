@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.server.ResponseStatusException;
 
+import javax.naming.AuthenticationException;
+import java.nio.file.AccessDeniedException;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
@@ -51,6 +53,29 @@ public class GlobalExceptionHandler {
                 LocalDateTime.now()
         );
         return new ResponseEntity<>(errorResponseDtoOut, ex.getStatusCode());
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<ErrorResponseDtoOut> handleAccessDenied(AccessDeniedException ex) {
+        ErrorResponseDtoOut errorResponseDtoOut = new ErrorResponseDtoOut(
+                HttpStatus.FORBIDDEN.value(),
+                "FORBIDDEN",
+                HttpStatus.FORBIDDEN.toString(),
+                LocalDateTime.now()
+        );
+        return new ResponseEntity<>(errorResponseDtoOut, HttpStatus.FORBIDDEN);
+    }
+
+    // 3. Ошибка аутентификации (401)
+    @ExceptionHandler(AuthenticationException.class)
+    public ResponseEntity<ErrorResponseDtoOut> handleAuthException(AuthenticationException ex) {
+        ErrorResponseDtoOut errorResponseDtoOut = new ErrorResponseDtoOut(
+                HttpStatus.UNAUTHORIZED.value(),
+                "UNAUTHORIZED",
+                HttpStatus.UNAUTHORIZED.toString(),
+                LocalDateTime.now()
+        );
+        return new ResponseEntity<>(errorResponseDtoOut, HttpStatus.UNAUTHORIZED);
     }
 
     @ExceptionHandler(Exception.class)
